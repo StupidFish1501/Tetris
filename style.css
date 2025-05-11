@@ -221,6 +221,59 @@ button:hover {
     gap: 5px;
 }
 
+/* Mobile Controls */
+.mobile-controls {
+    display: none;
+    width: 100%;
+    max-width: 360px;
+    margin: 20px auto;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mobile-controls-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.control-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+#rotateBtn {
+    background-color: rgba(106, 90, 205, 0.5);
+}
+
+#leftBtn, #rightBtn {
+    background-color: rgba(65, 105, 225, 0.5);
+}
+
+#dropBtn {
+    background-color: rgba(255, 165, 0, 0.5);
+}
+
+#hardDropBtn {
+    background-color: rgba(255, 69, 0, 0.5);
+    width: 120px;
+}
+
 @media (max-width: 1200px) {
     .container {
         padding: 10px;
@@ -252,6 +305,15 @@ button:hover {
     
     canvas#tetris {
         width: 100%;
+        max-width: 360px;
         height: auto;
+    }
+    
+    .mobile-controls {
+        display: flex;
+    }
+    
+    .controls {
+        display: none; /* Ẩn phần hiển thị điều khiển bàn phím trên mobile */
     }
 }

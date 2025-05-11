@@ -12,6 +12,13 @@ const resetBtn = document.getElementById('resetBtn');
 const soundBtn = document.getElementById('soundBtn');
 const volumeSlider = document.getElementById('volumeSlider');
 
+// Mobile control buttons
+const rotateBtn = document.getElementById('rotateBtn');
+const leftBtn = document.getElementById('leftBtn');
+const rightBtn = document.getElementById('rightBtn');
+const dropBtn = document.getElementById('dropBtn');
+const hardDropBtn = document.getElementById('hardDropBtn');
+
 // Audio elements
 const bgMusic = document.getElementById('bgMusic');
 const clearSound = document.getElementById('clearSound');
@@ -495,6 +502,78 @@ function changeVolume(e) {
     }
 }
 
+// Mobile Touch Controls
+function setupMobileControls() {
+    // Prevent default touchmove behavior to avoid scrolling while playing
+    document.addEventListener('touchmove', function(e) {
+        if (e.target.classList.contains('control-btn')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    // Support both click and touch events
+    function setupButton(button, action, isHoldable = false) {
+        // One-time press (click or tap)
+        button.addEventListener('click', action);
+        
+        // For holdable buttons (like left/right/down)
+        if (isHoldable) {
+            let intervalId = null;
+            
+            // Start holding
+            button.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (intervalId === null) {
+                    action(); // Execute once immediately
+                    intervalId = setInterval(action, 100); // Then repeatedly
+                }
+            });
+            
+            // Handle mouse down for desktop testing
+            button.addEventListener('mousedown', () => {
+                if (intervalId === null) {
+                    action();
+                    intervalId = setInterval(action, 100);
+                }
+            });
+            
+            // Stop holding on touch end, touch cancel, or mouse up
+            const stopHolding = () => {
+                if (intervalId !== null) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+            };
+            
+            button.addEventListener('touchend', stopHolding);
+            button.addEventListener('touchcancel', stopHolding);
+            button.addEventListener('mouseup', stopHolding);
+            button.addEventListener('mouseleave', stopHolding);
+        }
+    }
+    
+    // Set up all control buttons
+    setupButton(rotateBtn, () => {
+        if (!gameOver && !isPaused) playerRotate(1);
+    });
+    
+    setupButton(leftBtn, () => {
+        if (!gameOver && !isPaused) playerMove(-1);
+    }, true);
+    
+    setupButton(rightBtn, () => {
+        if (!gameOver && !isPaused) playerMove(1);
+    }, true);
+    
+    setupButton(dropBtn, () => {
+        if (!gameOver && !isPaused) playerDrop();
+    }, true);
+    
+    setupButton(hardDropBtn, () => {
+        if (!gameOver && !isPaused) playerHardDrop();
+    });
+}
+
 // Event listeners
 document.addEventListener('keydown', event => {
     if (gameOver) return;
@@ -640,6 +719,7 @@ function playBackgroundMusic() {
 document.addEventListener('DOMContentLoaded', () => {
     loadVolumePreference();
     initGame();
+    setupMobileControls();
     
     // Thêm CSS inline cho thông báo âm thanh
     const style = document.createElement('style');
