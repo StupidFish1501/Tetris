@@ -312,50 +312,76 @@ button:hover {
     display: none; /* Mặc định ẩn, chỉ hiện trên mobile */
     position: absolute;
     top: 10px;
-    right: -55px; /* Đặt ở bên phải cạnh canvas */
+    right: 10px; /* Sửa lại vị trí để hiển thị đúng */
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
+    z-index: 10; /* Đảm bảo nút hiển thị trên các phần tử khác */
 }
 
 .mobile-game-buttons button {
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    font-size: 18px;
+    font-size: 22px;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    opacity: 0.9;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent; /* Loại bỏ hiệu ứng highlight khi tap */
+}
+
+.mobile-button {
+    transition: transform 0.1s, background-color 0.2s;
+}
+
+.mobile-button:active {
+    transform: scale(0.9);
 }
 
 #startBtnMini {
     background-color: #4CAF50;
 }
 
+#startBtnMini:active {
+    background-color: #3d8b40;
+}
+
 #pauseBtnMini {
     background-color: #FFC107;
 }
 
+#pauseBtnMini:active {
+    background-color: #e6ac00;
+}
+
 /* Chỉnh sửa media query cho mobile */
 @media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
     .game-container {
         flex-direction: column;
         align-items: center;
         position: relative; /* Để định vị nút mini */
         margin: 0 auto;
-        padding: 0 30px; /* Thêm padding để có chỗ cho nút mini */
+        padding: 0;
     }
     
     /* Điều chỉnh vị trí nút mini trên mobile */
     .mobile-game-buttons {
-        right: 5px;
-        top: 50px;
+        display: flex;
+        right: 10px;
+        top: 10px;
     }
     
     .game-info {
         width: 100%;
         max-width: 100%;
+        margin-top: 20px;
     }
     
     .header {
@@ -365,7 +391,7 @@ button:hover {
     
     canvas#tetris {
         width: 100%;
-        max-width: 340px; /* Giảm nhẹ kích thước để có chỗ cho nút */
+        max-width: 360px;
         height: auto;
     }
     
@@ -382,23 +408,18 @@ button:hover {
     .game-info .buttons #pauseBtn {
         display: none;
     }
-    
-    /* Hiện nút mini */
-    .mobile-game-buttons {
-        display: flex;
-    }
 }
 
 @media (max-width: 400px) {
     /* Điều chỉnh vị trí nút mini trên điện thoại nhỏ */
     .mobile-game-buttons {
-        right: 2px;
-        top: 40px;
+        right: 10px;
+        top: 10px;
     }
     
     .mobile-game-buttons button {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
     }
 }
