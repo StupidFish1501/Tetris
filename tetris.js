@@ -504,57 +504,90 @@ function changeVolume(e) {
 
 // Mobile Touch Controls
 function setupMobileControls() {
-    // Prevent default touchmove behavior to avoid scrolling while playing
+    // Ngăn chặn toàn bộ hành vi vuốt màn hình trong khi chơi
     document.addEventListener('touchmove', function(e) {
-        if (e.target.classList.contains('control-btn')) {
+        if (animationId && !isPaused && !gameOver) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    // Ngăn chặn zoom trên thiết bị di động
+    document.addEventListener('touchstart', function(e) {
+        if (e.touches.length > 1 && animationId && !isPaused) {
             e.preventDefault();
         }
     }, { passive: false });
     
     // Support both click and touch events
     function setupButton(button, action, isHoldable = false) {
-        // One-time press (click or tap)
-        button.addEventListener('click', action);
+        // Tốc độ lặp lại cho các nút được giữ
+        const initialDelay = 200; // Độ trễ ban đầu (ms)
+        const repeatInterval = 80; // Khoảng thời gian lặp lại (ms)
         
-        // For holdable buttons (like left/right/down)
-        if (isHoldable) {
-            let intervalId = null;
+        // Theo dõi trạng thái nút
+        let isPressed = false;
+        let intervalId = null;
+        let timeoutId = null;
+        
+        // Hàm xử lý khi bắt đầu nhấn
+        const startAction = (e) => {
+            if (e && e.preventDefault) e.preventDefault();
+            if (isPressed || gameOver || isPaused) return;
             
-            // Start holding
-            button.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (intervalId === null) {
-                    action(); // Execute once immediately
-                    intervalId = setInterval(action, 100); // Then repeatedly
-                }
-            });
+            isPressed = true;
+            button.classList.add('active');
             
-            // Handle mouse down for desktop testing
-            button.addEventListener('mousedown', () => {
-                if (intervalId === null) {
-                    action();
-                    intervalId = setInterval(action, 100);
-                }
-            });
+            // Thực hiện hành động ngay lập tức
+            action();
             
-            // Stop holding on touch end, touch cancel, or mouse up
-            const stopHolding = () => {
-                if (intervalId !== null) {
-                    clearInterval(intervalId);
-                    intervalId = null;
-                }
-            };
+            // Nếu là nút có thể giữ, thiết lập độ trễ và lặp
+            if (isHoldable) {
+                clearTimeout(timeoutId);
+                clearInterval(intervalId);
+                
+                // Thiết lập độ trễ ban đầu trước khi lặp lại
+                timeoutId = setTimeout(() => {
+                    intervalId = setInterval(action, repeatInterval);
+                }, initialDelay);
+            }
+        };
+        
+        // Hàm xử lý khi kết thúc nhấn
+        const endAction = (e) => {
+            if (e && e.preventDefault && e.cancelable) e.preventDefault();
+            if (!isPressed) return;
             
-            button.addEventListener('touchend', stopHolding);
-            button.addEventListener('touchcancel', stopHolding);
-            button.addEventListener('mouseup', stopHolding);
-            button.addEventListener('mouseleave', stopHolding);
-        }
+            isPressed = false;
+            button.classList.remove('active');
+            
+            // Xóa các hẹn giờ
+            clearTimeout(timeoutId);
+            clearInterval(intervalId);
+            timeoutId = null;
+            intervalId = null;
+        };
+        
+        // Đăng ký sự kiện cảm ứng và chuột
+        button.addEventListener('touchstart', startAction, { passive: false });
+        button.addEventListener('mousedown', startAction);
+        
+        button.addEventListener('touchend', endAction);
+        button.addEventListener('touchcancel', endAction);
+        button.addEventListener('mouseup', endAction);
+        button.addEventListener('mouseleave', endAction);
+        
+        // Đảm bảo nút không giữ trạng thái khi game tạm dừng hoặc kết thúc
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) endAction();
+        });
     }
     
     // Set up all control buttons
     setupButton(rotateBtn, () => {
-        if (!gameOver && !isPaused) playerRotate(1);
+        if (!gameOver && !isPaused) {
+            playerRotate(1);
+            playSound(rotateSound);
+        }
     });
     
     setupButton(leftBtn, () => {
@@ -571,6 +604,124 @@ function setupMobileControls() {
     
     setupButton(hardDropBtn, () => {
         if (!gameOver && !isPaused) playerHardDrop();
+    });
+    
+    // Thiết lập sự kiện vuốt màn hình cho canvas
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping = false;
+    let isSwipingDown = false; // Biến theo dõi vuốt xuống
+    let downIntervalId = null; // ID của interval cho di chuyển xuống liên tục
+    
+    canvas.addEventListener('touchstart', (e) => {
+        if (gameOver || isPaused) return;
+        
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isSwiping = true;
+        isSwipingDown = false; // Reset trạng thái vuốt xuống
+        
+        // Xóa interval trước đó nếu có
+        if (downIntervalId) {
+            clearInterval(downIntervalId);
+            downIntervalId = null;
+        }
+    });
+    
+    canvas.addEventListener('touchmove', (e) => {
+        if (!isSwiping || gameOver || isPaused) return;
+        
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+        
+        const diffX = touchX - touchStartX;
+        const diffY = touchY - touchStartY;
+        
+        // Ngưỡng để xác định vuốt
+        const threshold = 30;
+        
+        // Nếu vuốt ngang đủ xa
+        if (Math.abs(diffX) > threshold && Math.abs(diffX) > Math.abs(diffY)) {
+            if (diffX > 0) {
+                playerMove(1); // Vuốt phải
+            } else {
+                playerMove(-1); // Vuốt trái
+            }
+            // Đặt lại điểm bắt đầu để tránh kích hoạt nhiều lần
+            touchStartX = touchX;
+            touchStartY = touchY;
+        }
+        // Nếu vuốt xuống đủ xa
+        else if (diffY > threshold && Math.abs(diffY) > Math.abs(diffX)) {
+            // Vuốt xuống - thực hiện ngay lập tức
+            playerDrop();
+            touchStartY = touchY;
+            
+            // Nếu chưa đang vuốt xuống liên tục, bắt đầu
+            if (!isSwipingDown) {
+                isSwipingDown = true;
+                
+                // Thiết lập interval để tiếp tục thả xuống mỗi 100ms khi người dùng giữ vuốt xuống
+                downIntervalId = setInterval(() => {
+                    if (!gameOver && !isPaused) {
+                        playerDrop();
+                    } else {
+                        // Dừng interval nếu game over hoặc pause
+                        clearInterval(downIntervalId);
+                        downIntervalId = null;
+                    }
+                }, 100);
+            }
+        }
+        // Nếu vuốt lên đủ xa
+        else if (diffY < -threshold && Math.abs(diffY) > Math.abs(diffX)) {
+            playerRotate(1); // Vuốt lên = xoay
+            touchStartY = touchY;
+            
+            // Dừng vuốt xuống liên tục nếu đang diễn ra
+            if (isSwipingDown) {
+                isSwipingDown = false;
+                clearInterval(downIntervalId);
+                downIntervalId = null;
+            }
+        }
+    });
+    
+    canvas.addEventListener('touchend', () => {
+        isSwiping = false;
+        
+        // Dừng vuốt xuống liên tục khi nhấc tay
+        if (isSwipingDown) {
+            isSwipingDown = false;
+            clearInterval(downIntervalId);
+            downIntervalId = null;
+        }
+    });
+    
+    canvas.addEventListener('touchcancel', () => {
+        isSwiping = false;
+        
+        // Dừng vuốt xuống liên tục khi sự kiện bị hủy
+        if (isSwipingDown) {
+            isSwipingDown = false;
+            clearInterval(downIntervalId);
+            downIntervalId = null;
+        }
+    });
+    
+    // Nhấn đúp để thả nhanh
+    let lastTap = 0;
+    canvas.addEventListener('touchend', (e) => {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+        
+        if (tapLength < 300 && tapLength > 0) {
+            // Nhấn đúp được phát hiện
+            playerHardDrop();
+            e.preventDefault();
+        }
+        
+        lastTap = currentTime;
     });
 }
 

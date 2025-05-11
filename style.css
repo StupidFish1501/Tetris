@@ -225,53 +225,73 @@ button:hover {
 .mobile-controls {
     display: none;
     width: 100%;
-    max-width: 360px;
+    max-width: 500px;
     margin: 20px auto;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
 }
 
 .mobile-controls-row {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 20px;
 }
 
 .control-btn {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 3px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    transition: all 0.2s;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent; /* Loại bỏ hiệu ứng highlight khi tap */
 }
 
 .control-btn:active {
-    transform: scale(0.95);
-    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(0.9) translateY(4px);
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 #rotateBtn {
-    background-color: rgba(106, 90, 205, 0.5);
+    background-color: rgba(106, 90, 205, 0.7);
 }
 
 #leftBtn, #rightBtn {
-    background-color: rgba(65, 105, 225, 0.5);
+    background-color: rgba(65, 105, 225, 0.7);
 }
 
 #dropBtn {
-    background-color: rgba(255, 165, 0, 0.5);
+    background-color: rgba(255, 165, 0, 0.7);
 }
 
 #hardDropBtn {
-    background-color: rgba(255, 69, 0, 0.5);
-    width: 120px;
+    background-color: rgba(255, 69, 0, 0.7);
+    width: 180px;
+    border-radius: 40px;
+}
+
+/* Tùy chỉnh cho điện thoại nhỏ hơn */
+@media (max-width: 400px) {
+    .control-btn {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
+    }
+    
+    #hardDropBtn {
+        width: 150px;
+    }
+    
+    .mobile-controls-row {
+        gap: 15px;
+    }
 }
 
 @media (max-width: 1200px) {
@@ -310,7 +330,7 @@ button:hover {
     }
     
     .mobile-controls {
-        display: flex;
+        display: none;
     }
     
     .controls {
