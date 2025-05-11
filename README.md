@@ -1,2 +1,2 @@
 # Tetris
-Game for me
+Cursor for fun
