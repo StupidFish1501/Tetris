@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris - finix15.site</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-mode">
+    <div class="container">
+        <div class="header">
+            <div class="options">
+                <button id="soundBtn">🔊 Sound: ON</button>
+                <div class="volume-control">
+                    <label for="volumeSlider">🔊</label>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="70">
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-container">
+            <canvas id="tetris" width="360" height="600"></canvas>
+            <div class="game-info">
+                <div class="score-container">
+                    <p>Score: <span id="score">0</span></p>
+                    <p>Lines: <span id="lines">0</span></p>
+                    <p>Level: <span id="level">1</span></p>
+                </div>
+                <div class="next-piece-container">
+                    <p>Next:</p>
+                    <canvas id="nextPiece" width="100" height="100"></canvas>
+                </div>
+                <div class="controls">
+                    <p>Controls:</p>
+                    <p>← → : Move left/right</p>
+                    <p>↑ : Rotate</p>
+                    <p>↓ : Soft drop</p>
+                    <p>Space : Hard drop</p>
+                    <p>P : Pause</p>
+                </div>
+                <div class="buttons">
+                    <button id="startBtn">Start Game</button>
+                    <button id="pauseBtn">Pause</button>
+                    <button id="resetBtn">Reset Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop>
+        <source src="sounds/tetris-theme.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="clearSound">
+        <source src="sounds/line-clear.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="moveSound">
+        <source src="sounds/move.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="rotateSound">
+        <source src="sounds/rotate.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="dropSound">
+        <source src="sounds/drop.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="gameOverSound">
+        <source src="sounds/gameover.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="levelUpSound">
+        <source src="sounds/levelup.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script src="tetris.js"></script>
+</body>
+</html> 

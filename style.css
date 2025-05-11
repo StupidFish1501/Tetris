@@ -1,0 +1,257 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --background-color: #222;
+    --text-color: #f0f0f0;
+    --card-bg: #333;
+    --canvas-border: #555;
+    --canvas-bg: #000;
+    --button-shadow: rgba(0, 0, 0, 0.3);
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
+    /* Background chính */
+    background-image: url('images/tetris-bg.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    max-width: 1000px;
+    width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+    /* Container mờ */
+    background-color: rgba(20, 20, 20, 0.85);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+.header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.options {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.header h1 {
+    margin-bottom: 0;
+}
+
+#soundBtn {
+    background-color: #1DB954;
+}
+
+#soundBtn:hover {
+    background-color: #1AA247;
+}
+
+#soundBtn.muted {
+    background-color: #ccc;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 5px 8px;
+    border-radius: 5px;
+}
+
+.volume-control label {
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.volume-control input[type="range"] {
+    width: 80px;
+    cursor: pointer;
+}
+
+/* Tùy chỉnh thanh slider cho các trình duyệt khác nhau */
+input[type="range"] {
+    -webkit-appearance: none;
+    height: 5px;
+    background: #d3d3d3;
+    border-radius: 5px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #1DB954;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #1DB954;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 800px;
+}
+
+canvas#tetris {
+    background-color: var(--canvas-bg);
+    border: 2px solid var(--canvas-border);
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+    flex: 0 0 auto;
+    max-height: 80vh;
+}
+
+canvas#nextPiece {
+    background-color: transparent;
+    border: none;
+}
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+    min-width: 200px;
+    flex: 1;
+    max-width: 250px;
+}
+
+.score-container, .next-piece-container, .controls {
+    background-color: var(--card-bg);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px var(--button-shadow);
+    transition: background-color 0.3s;
+}
+
+.score-container {
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.next-piece-container {
+    text-align: center;
+    background-color: transparent;
+}
+
+.controls {
+    font-size: 1.1em;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#pauseBtn {
+    background-color: #FFC107;
+}
+
+#pauseBtn:hover {
+    background-color: #FFA000;
+}
+
+#resetBtn {
+    background-color: #f44336;
+}
+
+#resetBtn:hover {
+    background-color: #d32f2f;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+@media (max-width: 1200px) {
+    .container {
+        padding: 10px;
+        margin: 10px;
+    }
+    
+    canvas#tetris {
+        max-height: 70vh;
+        width: auto;
+        height: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .game-info {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    canvas#tetris {
+        width: 100%;
+        height: auto;
+    }
+}
