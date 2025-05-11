@@ -307,10 +307,50 @@ button:hover {
     }
 }
 
+/* Nút điều khiển mini cho mobile */
+.mobile-game-buttons {
+    display: none; /* Mặc định ẩn, chỉ hiện trên mobile */
+    position: absolute;
+    top: 10px;
+    right: -55px; /* Đặt ở bên phải cạnh canvas */
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mobile-game-buttons button {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 18px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+#startBtnMini {
+    background-color: #4CAF50;
+}
+
+#pauseBtnMini {
+    background-color: #FFC107;
+}
+
+/* Chỉnh sửa media query cho mobile */
 @media (max-width: 768px) {
     .game-container {
         flex-direction: column;
         align-items: center;
+        position: relative; /* Để định vị nút mini */
+        margin: 0 auto;
+        padding: 0 30px; /* Thêm padding để có chỗ cho nút mini */
+    }
+    
+    /* Điều chỉnh vị trí nút mini trên mobile */
+    .mobile-game-buttons {
+        right: 5px;
+        top: 50px;
     }
     
     .game-info {
@@ -325,7 +365,7 @@ button:hover {
     
     canvas#tetris {
         width: 100%;
-        max-width: 360px;
+        max-width: 340px; /* Giảm nhẹ kích thước để có chỗ cho nút */
         height: auto;
     }
     
@@ -335,5 +375,30 @@ button:hover {
     
     .controls {
         display: none; /* Ẩn phần hiển thị điều khiển bàn phím trên mobile */
+    }
+    
+    /* Ẩn nút trong game-info */
+    .game-info .buttons #startBtn,
+    .game-info .buttons #pauseBtn {
+        display: none;
+    }
+    
+    /* Hiện nút mini */
+    .mobile-game-buttons {
+        display: flex;
+    }
+}
+
+@media (max-width: 400px) {
+    /* Điều chỉnh vị trí nút mini trên điện thoại nhỏ */
+    .mobile-game-buttons {
+        right: 2px;
+        top: 40px;
+    }
+    
+    .mobile-game-buttons button {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
     }
 }

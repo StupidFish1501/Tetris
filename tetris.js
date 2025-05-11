@@ -12,6 +12,10 @@ const resetBtn = document.getElementById('resetBtn');
 const soundBtn = document.getElementById('soundBtn');
 const volumeSlider = document.getElementById('volumeSlider');
 
+// Nút mini cho mobile
+const startBtnMini = document.getElementById('startBtnMini');
+const pauseBtnMini = document.getElementById('pauseBtnMini');
+
 // Mobile control buttons
 const rotateBtn = document.getElementById('rotateBtn');
 const leftBtn = document.getElementById('leftBtn');
@@ -747,6 +751,7 @@ document.addEventListener('keydown', event => {
     }
 });
 
+// Sự kiện cho nút chính
 startBtn.addEventListener('click', () => {
     if (gameOver) {
         resetGame();
@@ -755,6 +760,7 @@ startBtn.addEventListener('click', () => {
         isPaused = false;
         update();
         pauseBtn.style.display = 'block';
+        pauseBtnMini.textContent = '⏸';
         
         // Start background music if sound is enabled
         if (soundEnabled) {
@@ -762,6 +768,7 @@ startBtn.addEventListener('click', () => {
         }
     } else if (isPaused) {
         togglePause();
+        pauseBtnMini.textContent = '⏸';
     } else if (!animationId) {
         // Bắt đầu game khi ấn nút Start
         lastTime = performance.now();
@@ -769,6 +776,7 @@ startBtn.addEventListener('click', () => {
         update();
         // Hiển thị nút Pause khi game bắt đầu
         pauseBtn.style.display = 'block';
+        pauseBtnMini.textContent = '⏸';
         
         // Start background music if sound is enabled
         if (soundEnabled) {
@@ -781,6 +789,51 @@ pauseBtn.addEventListener('click', () => {
     if (!gameOver && animationId) {
         togglePause();
         // Cập nhật text của nút pause
+        pauseBtn.textContent = isPaused ? 'Resume' : 'Pause';
+        pauseBtnMini.textContent = isPaused ? '▶' : '⏸';
+    }
+});
+
+// Sự kiện cho nút mini
+startBtnMini.addEventListener('click', () => {
+    if (gameOver) {
+        resetGame();
+        // Bắt đầu game ngay sau khi reset
+        lastTime = performance.now();
+        isPaused = false;
+        update();
+        pauseBtn.style.display = 'block';
+        pauseBtnMini.textContent = '⏸';
+        
+        // Start background music if sound is enabled
+        if (soundEnabled) {
+            bgMusic.play().catch(e => console.log("Music start error:", e));
+        }
+    } else if (isPaused) {
+        togglePause();
+        pauseBtnMini.textContent = '⏸';
+        pauseBtn.textContent = 'Pause';
+    } else if (!animationId) {
+        // Bắt đầu game khi ấn nút Start
+        lastTime = performance.now();
+        isPaused = false;
+        update();
+        // Hiển thị nút Pause khi game bắt đầu
+        pauseBtn.style.display = 'block';
+        pauseBtnMini.textContent = '⏸';
+        
+        // Start background music if sound is enabled
+        if (soundEnabled) {
+            bgMusic.play().catch(e => console.log("Music start error:", e));
+        }
+    }
+});
+
+pauseBtnMini.addEventListener('click', () => {
+    if (!gameOver && animationId) {
+        togglePause();
+        // Cập nhật text của nút pause
+        pauseBtnMini.textContent = isPaused ? '▶' : '⏸';
         pauseBtn.textContent = isPaused ? 'Resume' : 'Pause';
     }
 });
