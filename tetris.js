@@ -10,6 +10,7 @@ const startBtn = document.getElementById('startBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const resetBtn = document.getElementById('resetBtn');
 const soundBtn = document.getElementById('soundBtn');
+const musicBtn = document.getElementById('musicBtn');
 const volumeSlider = document.getElementById('volumeSlider');
 
 // Nút mini cho mobile
@@ -34,11 +35,19 @@ const levelUpSound = document.getElementById('levelUpSound');
 
 // Sound settings
 let soundEnabled = true;
+let musicEnabled = true;
 let volume = 0.7; // Mặc định 70%
 
 // Thiết lập âm lượng ban đầu cho tất cả âm thanh
 function setAllVolumes(vol) {
-    bgMusic.volume = vol;
+    volume = vol;
+    
+    // Âm lượng nhạc nền
+    if (musicEnabled) {
+        bgMusic.volume = vol;
+    }
+    
+    // Âm lượng hiệu ứng âm thanh
     clearSound.volume = vol;
     moveSound.volume = vol * 0.6; // Giảm âm lượng cho âm thanh di chuyển
     rotateSound.volume = vol * 0.6; // Giảm âm lượng cho âm thanh xoay
@@ -440,8 +449,8 @@ function togglePause() {
         lastTime = performance.now();
         update();
         
-        // Resume background music if sound is enabled
-        if (soundEnabled) {
+        // Resume background music if music is enabled
+        if (musicEnabled) {
             bgMusic.play().catch(e => console.log("Music resume error:", e));
         }
     } else {
@@ -478,30 +487,50 @@ function toggleSound() {
         soundBtn.textContent = "🔊 Sound: ON";
         soundBtn.classList.remove('muted');
         
-        // Nếu game đang chạy và không bị tạm dừng, phát nhạc nền
-        if (animationId && !isPaused && !gameOver) {
-            bgMusic.play().catch(e => console.log("Music playback error:", e));
-        }
+        // Bật lại âm hiệu ứng, nhưng không bật nhạc nền (vì có nút riêng)
     } else {
         soundBtn.textContent = "🔇 Sound: OFF";
         soundBtn.classList.add('muted');
+        
+        // Tắt tất cả âm thanh hiệu ứng, nhưng không tắt nhạc nền
+    }
+}
+
+function toggleMusic() {
+    musicEnabled = !musicEnabled;
+    
+    if (musicEnabled) {
+        musicBtn.textContent = "🎵 Music: ON";
+        musicBtn.classList.remove('muted');
+        
+        // Phát nhạc nền nếu game đang chạy và không tạm dừng
+        if (animationId && !isPaused && !gameOver) {
+            bgMusic.volume = volume;
+            bgMusic.play().catch(e => console.log("Music playback error:", e));
+        }
+    } else {
+        musicBtn.textContent = "🔇 Music: OFF";
+        musicBtn.classList.add('muted');
+        
+        // Tắt nhạc nền
         bgMusic.pause();
+        bgMusic.currentTime = 0;
     }
 }
 
 function changeVolume(e) {
-    volume = e.target.value / 100;
-    setAllVolumes(volume);
+    const newVolume = e.target.value / 100;
+    setAllVolumes(newVolume);
     
     // Lưu trạng thái âm lượng vào localStorage
-    localStorage.setItem('tetrisVolume', volume);
+    localStorage.setItem('tetrisVolume', newVolume);
     
     // Nếu âm lượng được đặt về 0, tắt âm thanh
-    if (volume === 0 && soundEnabled) {
+    if (newVolume === 0 && soundEnabled) {
         toggleSound();
     }
     // Nếu âm lượng tăng từ 0 và âm thanh đang tắt, bật âm thanh
-    else if (volume > 0 && !soundEnabled) {
+    else if (newVolume > 0 && !soundEnabled) {
         toggleSound();
     }
 }
@@ -747,7 +776,7 @@ document.addEventListener('keydown', event => {
     } else if (event.key === 'p' || event.key === 'P') {
         togglePause();
     } else if (event.key === 'm' || event.key === 'M') {
-        toggleSound();
+        toggleMusic();
     }
 });
 
@@ -761,8 +790,8 @@ startBtn.addEventListener('click', () => {
         update();
         pauseBtn.style.display = 'block';
         
-        // Start background music if sound is enabled
-        if (soundEnabled) {
+        // Start background music if music is enabled
+        if (musicEnabled) {
             bgMusic.play().catch(e => console.log("Music start error:", e));
         }
     } else if (isPaused) {
@@ -775,8 +804,8 @@ startBtn.addEventListener('click', () => {
         // Hiển thị nút Pause khi game bắt đầu
         pauseBtn.style.display = 'block';
         
-        // Start background music if sound is enabled
-        if (soundEnabled) {
+        // Start background music if music is enabled
+        if (musicEnabled) {
             bgMusic.play().catch(e => console.log("Music start error:", e));
         }
     }
@@ -793,10 +822,13 @@ pauseBtn.addEventListener('click', () => {
 resetBtn.addEventListener('click', resetGame);
 
 soundBtn.addEventListener('click', toggleSound);
-
+musicBtn.addEventListener('click', function() {
+    toggleMusic();
+    localStorage.setItem('tetrisMusicEnabled', musicEnabled);
+});
 volumeSlider.addEventListener('change', changeVolume);
 
-// Load âm lượng đã lưu từ localStorage
+// Load cài đặt từ localStorage
 function loadVolumePreference() {
     const savedVolume = localStorage.getItem('tetrisVolume');
     if (savedVolume !== null) {
@@ -804,9 +836,86 @@ function loadVolumePreference() {
         volumeSlider.value = volume * 100;
         setAllVolumes(volume);
     }
+    
+    // Thêm load trạng thái nhạc nền nếu có
+    const savedMusicState = localStorage.getItem('tetrisMusicEnabled');
+    if (savedMusicState !== null) {
+        musicEnabled = savedMusicState === 'true';
+        if (!musicEnabled) {
+            musicBtn.textContent = "🔇 Music: OFF";
+            musicBtn.classList.add('muted');
+        }
+    }
 }
 
-// Initialize game
+// Start the game
+document.addEventListener('DOMContentLoaded', () => {
+    loadVolumePreference();
+    
+    // Khởi tạo game
+    initGame();
+    setupMobileControls();
+    initMobileButtons();
+    
+    // Phát nhạc nền ngay lập tức
+    if (musicEnabled) {
+        // Hack trình duyệt để phát nhạc ngay
+        bgMusic.muted = true;
+        bgMusic.play().then(() => {
+            // Unmute sau khi đã bắt đầu phát
+            setTimeout(() => {
+                if (musicEnabled) {
+                    bgMusic.muted = false;
+                }
+            }, 100);
+        }).catch(err => {
+            console.log("Autoplay prevented:", err);
+            
+            // Nếu không thể phát, thêm sự kiện click
+            const enableAudio = () => {
+                if (musicEnabled) {
+                    bgMusic.muted = false;
+                    bgMusic.play();
+                }
+                document.removeEventListener('click', enableAudio);
+            };
+            document.addEventListener('click', enableAudio);
+        });
+    }
+    
+    // Thêm CSS inline cho thông báo âm thanh
+    const style = document.createElement('style');
+    style.textContent = `
+        .audio-notice {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+// Hàm phát nhạc nền riêng biệt - đã cập nhật
+function playBackgroundMusic() {
+    if (!musicEnabled) return;
+    
+    // Tự động phát nhạc
+    bgMusic.volume = volume;
+    bgMusic.currentTime = 0;
+    
+    return bgMusic.play().catch(e => {
+        console.log("Auto-play prevented by browser:", e);
+    });
+}
+
+// Cập nhật lại hàm initGame để không tự động phát nhạc
 function initGame() {
     board = createMatrix(BOARD_WIDTH, BOARD_HEIGHT);
     playerReset();
@@ -836,68 +945,8 @@ function initGame() {
     animationId = null;
     updateScore();
     
-    // Phát nhạc nền ngay khi trang web được mở
-    if (soundEnabled) {
-        playBackgroundMusic();
-    }
+    // KHÔNG phát nhạc nền tại đây vì đã phát trong DOMContentLoaded
 }
-
-// Hàm phát nhạc nền riêng biệt
-function playBackgroundMusic() {
-    // Thử phát nhạc và xử lý lỗi nếu có
-    const playPromise = bgMusic.play();
-    
-    if (playPromise !== undefined) {
-        playPromise.catch(error => {
-            // Phát tự động bị chặn bởi trình duyệt
-            console.log("Auto-play prevented by browser:", error);
-            
-            // Thêm thông báo để người dùng biết
-            const audioNotice = document.createElement('div');
-            audioNotice.className = 'audio-notice';
-            audioNotice.innerHTML = 'Click anywhere to enable music';
-            document.body.appendChild(audioNotice);
-            
-            // Thêm sự kiện click vào document để bật nhạc
-            const enableAudio = () => {
-                bgMusic.play().then(() => {
-                    // Sau khi nhạc đã phát, xóa thông báo và bỏ sự kiện
-                    document.body.removeChild(audioNotice);
-                    document.removeEventListener('click', enableAudio);
-                }).catch(e => console.log("Still could not play audio:", e));
-            };
-            document.addEventListener('click', enableAudio);
-        });
-    }
-}
-
-// Start the game
-document.addEventListener('DOMContentLoaded', () => {
-    loadVolumePreference();
-    initGame();
-    setupMobileControls();
-    
-    // Thêm CSS inline cho thông báo âm thanh
-    const style = document.createElement('style');
-    style.textContent = `
-        .audio-notice {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            z-index: 1000;
-            cursor: pointer;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Đảm bảo nút mini hoạt động đúng
-    initMobileButtons();
-});
 
 // Hàm khởi tạo nút mini cho mobile
 function initMobileButtons() {
@@ -920,7 +969,7 @@ function initMobileButtons() {
                 pauseBtn.style.display = 'block';
                 pauseBtnMiniEl.textContent = '⏸';
                 
-                if (soundEnabled) {
+                if (musicEnabled) {
                     bgMusic.play().catch(e => console.log("Music start error:", e));
                 }
             } else if (isPaused) {
@@ -934,7 +983,7 @@ function initMobileButtons() {
                 pauseBtn.style.display = 'block';
                 pauseBtnMiniEl.textContent = '⏸';
                 
-                if (soundEnabled) {
+                if (musicEnabled) {
                     bgMusic.play().catch(e => console.log("Music start error:", e));
                 }
             }
@@ -952,7 +1001,7 @@ function initMobileButtons() {
                 pauseBtn.style.display = 'block';
                 pauseBtnMiniEl.textContent = '⏸';
                 
-                if (soundEnabled) {
+                if (musicEnabled) {
                     bgMusic.play().catch(e => console.log("Music start error:", e));
                 }
             } else if (isPaused) {
@@ -966,7 +1015,7 @@ function initMobileButtons() {
                 pauseBtn.style.display = 'block';
                 pauseBtnMiniEl.textContent = '⏸';
                 
-                if (soundEnabled) {
+                if (musicEnabled) {
                     bgMusic.play().catch(e => console.log("Music start error:", e));
                 }
             }

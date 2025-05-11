@@ -64,15 +64,71 @@ h1 {
     margin-bottom: 0;
 }
 
+/* Styles cho nút Sound và Music */
+#soundBtn, #musicBtn {
+    background-color: #1DB954;
+    border: none;
+    padding: 12px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+    
+    /* Loại bỏ mọi hiệu ứng thay đổi kích thước */
+    transform: none !important;
+    transition: background-color 0.3s !important;
+    box-shadow: none !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -ms-transform: none !important;
+    -o-transform: none !important;
+    scale: 1 !important;
+}
+
 #soundBtn {
     background-color: #1DB954;
+}
+
+#musicBtn {
+    background-color: #8C52FF;
 }
 
 #soundBtn:hover {
     background-color: #1AA247;
 }
 
+#musicBtn:hover {
+    background-color: #7B45DF;
+}
+
+#soundBtn:active, #musicBtn:active {
+    /* Đảm bảo không có hiệu ứng kích thước khi nhấn */
+    transform: none !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -ms-transform: none !important;
+    -o-transform: none !important;
+    box-shadow: none !important;
+    scale: 1 !important;
+}
+
+#soundBtn:active {
+    background-color: #159940;
+}
+
+#musicBtn:active {
+    background-color: #6A3AD0;
+}
+
 #soundBtn.muted {
+    background-color: #ccc;
+}
+
+#musicBtn.muted {
     background-color: #ccc;
 }
 
@@ -195,6 +251,7 @@ button {
     width: 100%;
 }
 
+/* Xác định rõ hiệu ứng khi hover cho các nút */
 button:hover {
     background-color: #45a049;
 }
@@ -422,4 +479,70 @@ button:hover {
         height: 45px;
         font-size: 20px;
     }
+}
+
+/* Ghi đè style cho button để đảm bảo nút Sound và Music không bị ảnh hưởng */
+button#soundBtn, 
+button#musicBtn {
+    /* Ghi đè các thuộc tính có thể gây ra thay đổi kích thước */
+    transform: none !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -ms-transform: none !important;
+    -o-transform: none !important;
+    transition: background-color 0.3s !important;
+    box-shadow: none !important;
+    scale: 1 !important;
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: auto !important; /* Sử dụng width tự động dựa trên nội dung */
+}
+
+button#soundBtn:hover, 
+button#musicBtn:hover,
+button#soundBtn:active, 
+button#musicBtn:active,
+button#soundBtn:focus, 
+button#musicBtn:focus {
+    /* Đảm bảo không có hiệu ứng kích thước trong mọi trạng thái */
+    transform: none !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -ms-transform: none !important;
+    -o-transform: none !important;
+    box-shadow: none !important;
+    scale: 1 !important;
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+/* Style riêng cho các nút tùy chọn (Sound và Music) */
+.option-btn {
+    padding: 8px 15px;
+    margin: 4px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: auto !important;
+    display: inline-block;
+    transform: none !important;
+    transition: background-color 0.3s !important;
+    font-size: 16px;
+    min-width: 120px;
+    box-sizing: border-box;
+}
+
+.option-btn:hover,
+.option-btn:active,
+.option-btn:focus {
+    transform: none !important;
+    box-shadow: none !important;
+    scale: 1 !important;
+}
+
+/* Không thay đổi width với .option-btn */
+#soundBtn.option-btn,
+#musicBtn.option-btn {
+    width: auto !important;
 }
