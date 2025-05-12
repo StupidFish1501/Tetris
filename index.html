@@ -10,11 +10,18 @@
     <div class="container">
         <div class="header">
             <div class="options">
-                <button id="soundBtn" class="option-btn">🔊 Sound: ON</button>
-                <button id="musicBtn" class="option-btn">🎵 Music: ON</button>
-                <div class="volume-control">
-                    <label for="volumeSlider">🔊</label>
-                    <input type="range" id="volumeSlider" min="0" max="100" value="70">
+                <div class="sound-controls">
+                    <button id="soundBtn" class="option-btn">🔊 Sound: ON</button>
+                    <button id="musicBtn" class="option-btn">🎵 Music: ON</button>
+                    <div class="volume-control">
+                        <label for="volumeSlider">🔊</label>
+                        <input type="range" id="volumeSlider" min="0" max="100" value="70">
+                    </div>
+                </div>
+                <!-- Mobile Next Piece Preview -->
+                <div class="mobile-next-piece">
+                    <p>Next:</p>
+                    <canvas id="mobilePiece" width="70" height="70"></canvas>
                 </div>
             </div>
         </div>

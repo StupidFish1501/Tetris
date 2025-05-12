@@ -3,6 +3,8 @@ const canvas = document.getElementById('tetris');
 const ctx = canvas.getContext('2d');
 const nextPieceCanvas = document.getElementById('nextPiece');
 const nextPieceCtx = nextPieceCanvas.getContext('2d');
+const mobilePieceCanvas = document.getElementById('mobilePiece');
+const mobilePieceCtx = mobilePieceCanvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const linesElement = document.getElementById('lines');
 const levelElement = document.getElementById('level');
@@ -209,6 +211,61 @@ function draw() {
             y: (nextPieceCanvas.height / BLOCK_SIZE - nextPiece.length) / 2
         };
         drawMatrix(nextPiece, offset, nextPieceCtx);
+        
+        // Draw on mobile next piece canvas if it exists
+        if (mobilePieceCtx) {
+            mobilePieceCtx.clearRect(0, 0, mobilePieceCanvas.width, mobilePieceCanvas.height);
+            
+            // Sử dụng kích thước khối nhỏ hơn cho mobile
+            const MOBILE_BLOCK_SIZE = 15; // Kích thước khối nhỏ hơn cho mobile
+            
+            const mobileOffset = {
+                x: (mobilePieceCanvas.width / MOBILE_BLOCK_SIZE - nextPiece[0].length) / 2,
+                y: (mobilePieceCanvas.height / MOBILE_BLOCK_SIZE - nextPiece.length) / 2
+            };
+            
+            // Vẽ khối với kích thước nhỏ hơn cho mobile
+            nextPiece.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        // Vẽ khối chính
+                        mobilePieceCtx.fillStyle = COLORS[value];
+                        mobilePieceCtx.fillRect(
+                            (mobileOffset.x + x) * MOBILE_BLOCK_SIZE,
+                            (mobileOffset.y + y) * MOBILE_BLOCK_SIZE,
+                            MOBILE_BLOCK_SIZE,
+                            MOBILE_BLOCK_SIZE
+                        );
+                        
+                        // Viền ngoài
+                        mobilePieceCtx.strokeStyle = '#000';
+                        mobilePieceCtx.lineWidth = 1;
+                        mobilePieceCtx.strokeRect(
+                            (mobileOffset.x + x) * MOBILE_BLOCK_SIZE,
+                            (mobileOffset.y + y) * MOBILE_BLOCK_SIZE,
+                            MOBILE_BLOCK_SIZE,
+                            MOBILE_BLOCK_SIZE
+                        );
+                        
+                        // Hiệu ứng sáng (phần trên và trái)
+                        mobilePieceCtx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                        mobilePieceCtx.beginPath();
+                        mobilePieceCtx.moveTo((mobileOffset.x + x) * MOBILE_BLOCK_SIZE, (mobileOffset.y + y) * MOBILE_BLOCK_SIZE);
+                        mobilePieceCtx.lineTo((mobileOffset.x + x + 1) * MOBILE_BLOCK_SIZE, (mobileOffset.y + y) * MOBILE_BLOCK_SIZE);
+                        mobilePieceCtx.lineTo((mobileOffset.x + x) * MOBILE_BLOCK_SIZE, (mobileOffset.y + y + 1) * MOBILE_BLOCK_SIZE);
+                        mobilePieceCtx.fill();
+                        
+                        // Hiệu ứng tối (phần dưới và phải)
+                        mobilePieceCtx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                        mobilePieceCtx.beginPath();
+                        mobilePieceCtx.moveTo((mobileOffset.x + x + 1) * MOBILE_BLOCK_SIZE, (mobileOffset.y + y) * MOBILE_BLOCK_SIZE);
+                        mobilePieceCtx.lineTo((mobileOffset.x + x + 1) * MOBILE_BLOCK_SIZE, (mobileOffset.y + y + 1) * MOBILE_BLOCK_SIZE);
+                        mobilePieceCtx.lineTo((mobileOffset.x + x) * MOBILE_BLOCK_SIZE, (mobileOffset.y + y + 1) * MOBILE_BLOCK_SIZE);
+                        mobilePieceCtx.fill();
+                    }
+                });
+            });
+        }
     }
 }
 
@@ -852,10 +909,49 @@ function loadVolumePreference() {
 document.addEventListener('DOMContentLoaded', () => {
     loadVolumePreference();
     
+    // Kiểm tra xem có phải là thiết bị di động không
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    
+    // Hiển thị next piece di động nếu là thiết bị di động
+    const mobileNextPiece = document.querySelector('.mobile-next-piece');
+    if (mobileNextPiece) {
+        if (isMobile) {
+            mobileNextPiece.style.display = 'flex';
+        } else {
+            mobileNextPiece.style.display = 'none';
+        }
+    }
+    
+    // Hiển thị nút mini cho mobile
+    const mobileGameButtons = document.querySelector('.mobile-game-buttons');
+    if (mobileGameButtons && isMobile) {
+        mobileGameButtons.style.display = 'flex';
+    }
+    
     // Khởi tạo game
     initGame();
     setupMobileControls();
     initMobileButtons();
+    
+    // Lắng nghe sự kiện thay đổi kích thước màn hình
+    window.addEventListener('resize', () => {
+        const isMobile = window.matchMedia("(max-width: 768px)").matches;
+        if (mobileNextPiece) {
+            if (isMobile) {
+                mobileNextPiece.style.display = 'flex';
+            } else {
+                mobileNextPiece.style.display = 'none';
+            }
+        }
+        
+        if (mobileGameButtons) {
+            if (isMobile) {
+                mobileGameButtons.style.display = 'flex';
+            } else {
+                mobileGameButtons.style.display = 'none';
+            }
+        }
+    });
     
     // Phát nhạc nền ngay lập tức
     if (musicEnabled) {
